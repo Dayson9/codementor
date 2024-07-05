@@ -1,0 +1,179 @@
+@font-face {
+    font-family: "Legion";
+    src: url(/src/fonts/legion.otf);
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Grotesk";
+    src: url(/src/fonts/grotesk.woff2);
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+.legion {
+  font-family: "legion";
+}
+
+.grotesk {
+  font-family: "Grotesk";
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Grotesk", sans-serif;
+}
+
+  * {
+  transition: .3s;
+}
+
+header {
+  width: 100vw;
+  height: 60px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+  box-sizing: border-box;
+}
+
+.gradient{
+    background: linear-gradient(135deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+}
+
+#hero {
+  width: 100vw;
+  height: 50vh;
+  text-align: center;
+  margin-top: 100px;
+}
+
+.hero-content {
+  width: 100%;
+  height: auto;
+  padding-inline: 12px;
+  box-sizing: border-box;
+}
+
+#hero h1 {
+  font-size: 40px;
+  font-family: "Grotesk";
+  font-weight: 800;
+  color: #130F23;
+  margin-bottom: 12px;
+  
+}
+
+#hero span{
+ font-weight: 00;
+ color: #130F23;
+}
+
+#hero button {
+  width: 42%;
+  height: 48px;
+  margin-top: 16px;
+  border-radius: 5px;
+  background: auto;
+  font-size: 17px;
+  font-weight: 500;
+  font-family: "Grotesk";
+  outline-style: solid;
+  outline-width: 0px;
+}
+
+#hero button:hover{
+  outline-width: 4px;
+}
+
+.purp {
+  outline-color: #A3C1FC;
+  background: linear-gradient(199deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
+  transform: translateX(-5px);
+  border: none;
+  color: white;
+}
+
+.dark {
+  outline-color: #130F233B;
+  background: transparent;
+  transform: translateX(5px);
+  color: #130F23;
+  border: 2px solid #130F23;
+}
+
+#features {
+  width: 100%;
+  height: auto;
+  padding-block: 10px;
+}
+
+#features h2 {
+  text-align: center;
+}
+
+.row{
+width: 100%;
+min-height: 100px;
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: space-around;
+text-align: left; 
+}
+
+.row i{
+width: 50px;
+height: 50px;
+text-align: center;
+font-size: 30px;
+padding-top: 10px;
+box-sizing: border-box;
+border-radius: 50%;
+margin-top: -50px;
+background: linear-gradient(135deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1))!important;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+}
+
+.col{
+width: 80%;
+}
+
+footer {
+ width: 100%;
+ height: auto;
+ background: #130F23;
+ text-align: center;
+ color: white;
+ padding-block: 30px;
+ 
+}
+
+ a {
+  text-decoration: none;
+  color: rgba(42, 139, 240, 1);
+}
+
+#info {
+  width: 90%;
+  height: auto;
+  padding-block: 10px;
+  background: rgba(42, 139, 240, 0.3);
+  margin-left: 5%;
+  border-left: 3px solid rgba(42, 139, 240, 1);
+  border-radius: 5px;
+  padding-inline: 5px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
