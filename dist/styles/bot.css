@@ -1,5 +1,5 @@
 * {
-transition: .3s;  
+  transition: .3s;
 }
 
 
@@ -7,8 +7,17 @@ header {
   justify-content: center!important;
   position: fixed;
   top: 0;
-  z-index: 1;
+  background: white;
 }
+
+.header img {
+ transform: translateX(-10px);
+}
+
+.header h1 {
+  transform: translateX(10px);
+}
+
 
 .container {
   width: 100%;
@@ -24,34 +33,32 @@ header {
   position: fixed;
   bottom: -15px;
   padding: 10px;
-  background: transparent;
-  backdrop-filter: blur(5px);
+  background: white;
   box-sizing: border-box;
 }
 
 .bottom input, textarea {
-  background: transparent!important;
-    backdrop-filter: blur(5px);
-    box-sizing: border-box;
+  background: white;
+  box-sizing: border-box;
 }
 
 .bottom textarea {
- width: 97%;
- height: 45px;
- border-radius: 10px;
- border: 2px solid rgba(0, 0, 0, 0.2);
- padding: 8px;
- box-sizing: content-box;
- margin-bottom: -15px;
- margin-left: -13px;
- outline: none;
- font-family: "Grotesk";
+  width: 97%;
+  height: 45px;
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  box-sizing: content-box;
+  margin-bottom: -15px;
+  margin-left: -13px;
+  outline: none;
+  font-family: "Grotesk";
 }
 
 textarea:focus {
   width: 80vw;
   border-color: rgba(42, 139, 240, 1);
-  
+
 }
 
 .row {
@@ -59,16 +66,16 @@ textarea:focus {
 }
 
 .bottom input[type=text] {
-   width: 85%;
-   height: 35px;
-   border-radius: 60px;
-   border: 2px solid rgba(0,0,0,0.2);
-   padding-inline: 8px;
-   box-sizing: content-box;
-   margin-block: -30px;
-   margin-left: -10px;
-   outline: none;
-   font-family: "Grotesk";
+  width: 85%;
+  height: 35px;
+  border-radius: 60px;
+  border: 2px solid rgba(0,0,0,0.2);
+  padding-inline: 8px;
+  box-sizing: content-box;
+  margin-block: -30px;
+  margin-left: -10px;
+  outline: none;
+  font-family: "Grotesk";
 }
 
 input[type=text]:focus {
@@ -82,7 +89,7 @@ input[type=text]:focus {
   color: white;
   border: none;
   margin-left: 10px;
-  background: rgba(42, 139, 240, 1);
+  background: linear-gradient(155deg, rgba(42, 139, 240), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
 }
 
 button:hover {
@@ -96,7 +103,7 @@ button:hover {
 
 #main {
   width: 100%;
-  height: 84%;
+  height: 58%;
   padding-block: 10px;
   padding-inline: 10px;
   background: white;
@@ -104,26 +111,57 @@ button:hover {
   flex-direction: column;
   justify-content: start;
   position: fixed;
-  bottom: 0;
+  top: 10%;
+  overflow-x: hidden;
   overflow-y: scroll;
+  box-sizing: border-box;
 }
 
 #main > div {
+  width: auto;
   max-width: 55%;
   height: auto;
-  padding-block: 30px;
   border-radius: 8px;
   color: white;
-  padding-inline: 5px;
   box-sizing: border-box;
-  margin-block: 10px;
+  margin-top: 15px;
+  padding-inline: 3.5%;
+  padding-block: 3.0%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+div code {
+  font-family: "grotesk";
+  font-size: 13px;
 }
 
 .user {
   background: linear-gradient(155deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
-  transform: translateX(68%);
+  margin-left: 44.5%;
 }
 
 .bot {
- background: rgba(0,0,0,0.35);
+  background: #130F2385;
+}
+
+@media (min-width: 768px) {
+  .chat {
+    width: 60%;
+    margin-left: 0%;
+  }
+  
+  .bottom {
+   width: 60%;
+   margin-left: 20%; 
+  }
+  
+  #main {
+    width: 60%;
+    margin-left: 20%;
+  }
+  
+  .user {
+    margin-left: 45%;
+  }
 }

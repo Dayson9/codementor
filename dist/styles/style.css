@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Legion";
-    src: url(/src/fonts/legion.otf);
+    src: url(../fonts/legion.otf);
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: "Grotesk";
-    src: url(/src/fonts/grotesk.woff2);
+    src: url(../fonts/grotesk.woff2);
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -45,8 +45,17 @@ header {
   box-sizing: border-box;
 }
 
+header h1 {
+  transform: translateX(-30%);
+}
+
+.header img {
+  width: 40px;
+  height: 40px;
+}
+
 .gradient{
-    background: linear-gradient(135deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
+    background: linear-gradient(135deg, rgba(105, 78, 255, 1), rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(42, 218, 240, 1));
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
 }
@@ -176,4 +185,33 @@ footer {
   padding-inline: 5px;
   margin-bottom: 20px;
   box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  header h1 {
+  transform: translateX(0%);
+}
+
+  #hero {
+   height: 30vh; 
+  }
+  
+  #hero button {
+    width: 23%;
+    font-size: 14px;
+  }
+  
+  #features {
+    width: 80%;
+    margin-left: 10%;
+  }
+
+#info {
+  width: 80%;
+  margin-left: 10%;
+}  
+  footer {
+    position: absolute;
+    bottom: 0px;
+  }
 }
