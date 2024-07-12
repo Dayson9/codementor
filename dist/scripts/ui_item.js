@@ -6,9 +6,12 @@ const UI_items = [`
       </div>
 
       <header class="header">
-          <img src="./images/neuro_logo.png" alt="NeuroCode logo">
-          <h1 class="legion gradient">Neurocode</h1>
+          <i class="bx bx-menu-alt-left"></i>
+          <div class="rowtop">
+            <img src="./images/neuro_logo.png" alt="NeuroCode logo">
+            <h1 class="legion gradient">Neurocode</h1>
+          </div>
       </header>
 `];
 
-export {UI_items}
+export { UI_items }

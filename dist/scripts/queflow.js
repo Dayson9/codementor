@@ -1,13 +1,14 @@
-/*! QueFlowJS | (c) 2024 Dayson9 | MIT License | https://github.com/Dayson9/QueFlowJS */
+/*! QueFlowJS | (c) 2024 Dayson9 | MIT License | https://github.com/dayson9/queflowjs */
 
 const QueFlow = ((exports) => {
+  'use-strict';
   // Stores data for all registered components and their associated template placeholders.
   var dataQF = [],
     // Counter for generating unique IDs for elements with reactive data.
-    counterQF = 0,
-    // Placeholder for future component storage.
-    components = {};
-
+    counterQF = 0;
+    
+    _this = {};
+    
   // Selects an element in the DOM using its data-qfid attribute.
   function selectElement(qfid) {
     return document.querySelector("[data-qfid=" + qfid + "]");
@@ -31,7 +32,7 @@ const QueFlow = ((exports) => {
     return x > x1 ? x : x1;
   }
 
-  // Checks if a string is not an event handler (e.g., "onClick").
+  // Checks if a string is not an event handler (e.g., "onclick").
   function isNotEvent(str) {
     // Regex to match strings starting with "on".
     let reg = /^[on]{1}.{1,}$/;
@@ -54,14 +55,13 @@ const QueFlow = ((exports) => {
     return [decision, evaluateTemplate(len, temp)];
   }
 
-  // Filters out components from dataQF that are no longer associated with existing elements in the DOM.
+  // Filters out null elements from the given input [Array].
   function filterNullElements(input) {
-   let data = [];
-    input.forEach((d) => {
+  let data = input.filter((d) => {
       let el = selectElement(d.qfid);
-      // Only keeps components that have an existing element.
+      // If element is truthy, return 'd'.
       if (el) {
-        data.push(d);
+        return d;
       }
     });
     
@@ -109,43 +109,39 @@ const QueFlow = ((exports) => {
     }
   }
 
-  // Creates a reactive signal, a proxy object that automatically updates the DOM/Component when its values change.
-  function createSignal(data, object) {
-  let item = typeof data != "object" ? { value: data } : JSON.parse(JSON.stringify(data));
+  // Creates a reactive signal, a proxy object that automatically triggers when its values changes.
+function createSignal(data, object) {
+  let item = typeof data != "object" ? { value: data } : data;
 
-  function createReactiveObject(obj) {
-    if (typeof obj !== "object") return obj;
+let host = object.host;
 
-    return new Proxy(obj, {
-      get(target, key) {
-        return createReactiveObject(target[key]); // Make nested objects reactive
-      },
-      set(target, key, value) {
-        if (target[key] === value) return true;
-        key = (parseInt(key)) ? parseInt(key) : key;
-  
-        if (object.forComponent) {
-          let self = object.self;
-          if (!self.isFrozen) {
-          if (key > self.data.length-1) {
+let handler = {
+  get: (target, key) => {
+    if (['object', 'array'].indexOf(typeof target[key]) > -1) {
+      return createSignal(target[key], host);
+    }
+    return target[key];
+    },
+    
+  set: (target, key, value) =>{
+    key = (parseInt(key)) ? parseInt(key) : key;
+   
+      if (!host.isFrozen) {
+        if (key > host.data.length - 1) {
           target[key] = value; // Update the target object accordingly
-          self.render();
-          } else {
-            target[key] = value; // Update the target object accordingly
-            updateComponent(key, self);
-          }
-          }
+          host.render();
         } else {
-          target[key] = value; // Update the target object accordingly
-          updateDOM(key);
+         // Update the target object accordingly
+          target[key] = value; 
+          _this = host;
+          updateComponent(key, host);
         }
-        return true; 
-      },
-    });
+      }
+      return true;
+    }
   }
-
-  let proxy = createReactiveObject(item);
-  return proxy;
+   
+  return new Proxy(item, handler);
 }
 
   // Checks if a DOM element has child elements.
@@ -204,10 +200,9 @@ const QueFlow = ((exports) => {
       for (i = 0; i < len; i++) {
         // Extracts the placeholder expression.
         extracted = stringBetween(out, "{{", "}}");
-        
         // Evaluates the placeholder expression then sanitizes it.
-        parsed = sanitizeString(Function('"use-strict"; return ' + extracted)());
-   
+    
+        parsed = Function('"use-strict"; return ' + extracted)();
         // Replaces the placeholder with its evaluated value.
         out = out.replace("{{" + extracted + "}}", parsed);
       }
@@ -295,6 +290,7 @@ const QueFlow = ((exports) => {
 
     // Sanitizes the JSX/HTML string.
     let sanitized = sanitizeString(jsx);
+    
     div.innerHTML = sanitized;
     div.innerHTML = div.innerText;
    
@@ -306,16 +302,15 @@ const QueFlow = ((exports) => {
       children.forEach((c) => {
         // Checks if the element has no children.
         if (!hasChildren(c)[0]) {
-          if (!isComponent) {
+          if(!isComponent) {
           // Gets the attributes of the element.
           attributes = getAttributes(c);
           attributes.push({ attribute: "innerHTML", value: c.innerText });
          
           // Iterates through each attribute.
-          for (let attribute of attributes) {
-            let val = attribute.value;
+          for (let {value} of attributes) {
             // Checks if the attribute value contains placeholders.
-            if (val.includes("{{") && val.includes("}}")) {
+            if (value.includes("{{") && value.includes("}}")) {
               // Assigns a unique ID to the element if the attribute contains templates.
               c.dataset.qfid = "qf" + counterQF;
               // Increments the counter for the next element.
@@ -324,26 +319,27 @@ const QueFlow = ((exports) => {
               break;
             }
           }
-          
-          
-          // Parses the element's attributes and registers it for reactive updates.
+               // Parses the element's attributes and registers it for reactive updates.
           out = parseQF(attributes, div.innerHTML, c.dataset.qfid, isComponent);
-        } else {
-          data = [...data, ...generateComponentData(c)];
-        }
+          } else {
+            data = [...data, ...generateComponentData(c)];
+          }
         }
       });
       
     } catch (error) {
       console.error("An error occurred while processing JSX/HTML", error);
     }
-
-   let len = countPlaceholders(div.innerHTML);
-   out = evaluateTemplate(len, div.innerHTML);
    
     // Removes the temporary div element from the DOM.
     div.remove();
-
+    
+      if(isComponent) {
+        let len = countPlaceholders(div.innerHTML);
+        out = evaluateTemplate(len, div.innerHTML);
+      }
+     
+      
     // Returns the parsed HTML string.
     return [out, data];
   }
@@ -366,14 +362,14 @@ const QueFlow = ((exports) => {
       } else {
         app.innerHTML = prep;
       }
-    } else {
+     } else {
       // Logs an error if the selector is invalid.
       throw new Error("An element with the provided selector: ", selector, "does not exist");
     }
   }
 
   // Re-renders the content of a specified element, updating its reactive components.
-  function reRender(selector) {
+  function iRender(selector) {
     let app = typeof selector == "string" ? document.querySelector(selector) : selector;
     // Checks if the selector is valid.
     if (app) {
@@ -412,72 +408,71 @@ function isSame(obj1, obj2) {
   return result;
 }
 
-// Generates and returns data property for a component based on 'child' parameter
+// Generates and returns dataQF property for a component based on 'child' parameter
 function generateComponentData(child) {
   let arr = [], attr = getAttributes(child, true), id = child.dataset.qfid;
   
   // Pushes innertext attribute into 'attr'
   attr.push({attribute: "innerHTML", value: child.innerText});
   
-  if(!id) {
-    child.dataset.qfid = "qf" + counterQF;
-    id = child.dataset.qfid;
-  }
+for (let {attribute, value} of attr){
   
-  attr.forEach((a) =>{
-    // If attribute includes template placeholders, push it into 'arr'
-    let name = a.attribute, value = a.value;
- 
-  if (child.style[name] || child.style[name] == "") {
-     child.style[name] = value;
-     child.removeAttribute(name);
-     if (value.includes("{{") && value.includes("}}")) {
-       arr.push({ template: value, key: "style."+name, qfid: id });
-     }
-   } else {
-     if (value.includes("{{") && value.includes("}}")) {
-      arr.push({ template: value, key: name, qfid: id });
+    let hasTemplate = (value.includes("{{") && value.includes("}}"));
+    let len = countPlaceholders(value);
+      
+    if (!id && hasTemplate) {
+     child.dataset.qfid = "qf" + counterQF;
+     id = "qf" + counterQF;
+     counterQF++;
     }
+
+   if (child.style[attribute] || child.style[attribute] === "") {
+     child.style[attribute] = evaluateTemplate(len, value);
+     child.removeAttribute(attribute);
+   }
+
+  
+    if (hasTemplate) {
+      (child.style[attribute] || child.style[attribute] === "") ? arr.push({ template: value, key: "style."+attribute, qfid: id }) : arr.push({ template: value, key: attribute, qfid: id });
    }
    
  
-  });
-
+  }
+  
 // Returns arr 
   return arr;
-  
 }
 
-  // Defines a QComponent constructor 'for creating and managing components.
-  function QComponent(selector, options = {}) {
-    
-  // Assigns the current instance to self.
-  self = this;
 
+  // Defines a QComponent class 'for creating and managing components.
+class QComponent {
+  constructor(selector, options = {}) { 
+  // Assigns the current instance to _this.
+   _this = this;
 // Stores the element associated with a component
-self.element = typeof selector == "string" ? document.querySelector(selector) : selector;
+   _this.element = typeof selector == "string" ? document.querySelector(selector) : selector;
 
-if(!self.element) {
-  throw new Error("Element selector for component is invalid ",  selector)
-}
+  if(!_this.element) {
+    throw new Error("Element selector for component is invalid ",  selector)
+  }
  
   // Creates a reactive signal for the component's data.
-  self.data = createSignal(options.data, {forComponent: true, self: self});
+  _this.data = createSignal(options.data, {forComponent: true, host: this});
 
-// Asigns the value of 'self.data' to _data
-_data = self.data;
+// Asigns the value of '_this.data' to _data
+  let _data = _this.data;
 
   // Stores the options provided to the component.
-  self.options = options;
+  _this.options = options;
 
 // Stores the current 'freeze status' of the component
-self.isFrozen = false;
+  _this.isFrozen = false;
 
 // Stores the components' reactive elements data
-self.dataQF = [];
+  _this.dataQF = [];
 
   // Defines properties for the component instance.
-  Object.defineProperties(self, {
+  Object.defineProperties(_this, {
     template: { value: options.template },
     data: {
       // Getters and setters for 'data' property 
@@ -485,82 +480,79 @@ self.dataQF = [];
         return _data;
       },
       set: (data) => {
-        // If 'data' is not same as 'self.data' and component is not frozem
-        if (!isSame(data, self.data) && !self.isFrozen) {
-        _data = createSignal(data, {forComponent: true, self: self});
-       self.dataQF = filterNullElements(self.dataQF);
-        self.render();
+        // If 'data' is not same as '_this.data' and component is not frozem
+        if (!isSame(data, _this.data) && !_this.isFrozen) {
+          _data = createSignal(data, {forComponent: true, host: this});
+          _this.dataQF = filterNullElements(_this.dataQF);
+          _this.render();
         }
         return true;
-      },  
+      },
+      configurable: true
     }
     });
-    
-    
 
-}
-
-  // Renders the component's template into its associated DOM element
-  QComponent.prototype.render = function () {
-    let el = self.element;
-    // Checks if the component's template is a string or a function.
-    let template = self.template instanceof Function ? self.template() : self.template;
-    
-    let rendered = jsxToHTML(template, true);
-    
-    el.innerHTML = rendered[0];
-    self.dataQF = rendered[1];
   }
 
-QComponent.prototype.freeze = () =>{
-  // Freezes component
-  self.isFrozen = true;
-}
+  render() {
+    let el = this.element;
+    
+    // Checks if the component's template is a string or a function.
+    let template = this.template instanceof Function ? this.template(this.data) : this.template;
 
-QComponent.prototype.unfreeze = () => {
-  // Unfreezes component
-  self.isFrozen = false;
+    _this = this;
+    let rendered = jsxToHTML(template, true);
+  
+    el.innerHTML = rendered[0];
+    this.dataQF = rendered[1];
+  }
+
+  freeze(){
+    // Freezes component
+    this.isFrozen = true;
+  }
+
+  unfreeze(){
+    // Unfreezes component
+    this.isFrozen = false;
+  }
+
 }
 
 function style(child, key, evaluated) {
-  
   if(key.indexOf("style.") > -1) {
      child.style[key.slice(6)] = evaluated;
   } else {
-  if(evaluated !== child[key]){
-     
-        if (isNotEvent(key)) {
-          child[key] = evaluated;
+    if(evaluated !== child[key]){
+       if (isNotEvent(key)) {
+         child[key] = evaluated;
           
         } else {
           child.addEventListener(key.slice(2), evaluated);
         }
-      }
+    }
   }
 }
 
+
 // Updates a component based on changes made to it's data
 function updateComponent(ckey, obj) {
-  let { dataQF } = obj, currentTemplate;
-  
-  // Filters Null elements from the Component
-  obj.dataQF = filterNullElements(dataQF);
- 
- dataQF = obj.dataQF;
-  
+// Filters Null elements from the Component
+
+obj.dataQF = filterNullElements(obj.dataQF);
+
+let { dataQF } = obj;
+
 for (let d of dataQF) {
     let { template, key, qfid } = d;
     let child = selectElement(qfid);
-    if (child) {
-    if(template.includes(ckey)){
-      let len = countPlaceholders(template),
-    
-      evaluated = evaluateTemplate(len, template);
-      key = (key === "class") ? "className" : key;
+      if(template.includes(ckey)){
+        let len = countPlaceholders(template),
+        evaluated = evaluateTemplate(len, template);
       
-     style(child, key, evaluated);
-    }     
-    } 
+        key = (key === "class") ? "className" : key;
+        style(child, key, evaluated);
+      } 
   }
  
 }
@@ -568,7 +560,7 @@ for (let d of dataQF) {
   // Exports the public APIs of QueFlowJS.
   exports.Render = Render;
   exports.createSignal = createSignal;
-  exports.reRender = reRender;
+  exports.iRender = iRender;
   exports.QComponent = QComponent;
 
   // Define the exports as an ES Module

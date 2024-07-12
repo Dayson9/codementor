@@ -1,13 +1,23 @@
 * {
-  transition: .3s;
+  transition: .3s!important;
 }
 
 
 header {
-  justify-content: center!important;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   background: white;
+}
+
+.rowtop {
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  transform: translateX(-27vw);
 }
 
 .header img {
@@ -43,7 +53,7 @@ header {
 }
 
 .bottom textarea {
-  width: 97%;
+  width: 83%;
   height: 45px;
   border-radius: 10px;
   border: 2px solid rgba(0, 0, 0, 0.2);
@@ -55,14 +65,26 @@ header {
   font-family: "Grotesk";
 }
 
-textarea:focus {
-  width: 80vw;
-  border-color: rgba(42, 139, 240, 1);
+.bottom small {
+  align-self: start!important;
+  margin-left: 4.5%;
+}
 
+textarea:focus {
+  border-color: rgba(42, 139, 240, 1);
 }
 
 .row {
   width: 80vw;
+}
+
+.column {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .bottom input[type=text] {
