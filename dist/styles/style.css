@@ -45,13 +45,47 @@ header {
   box-sizing: border-box;
 }
 
+header i {
+  width: 50px;
+  height: 50px;
+  background: white;
+  color: rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
 header h1 {
-  transform: translateX(-30%);
+  transform: translateX(-5%);
 }
 
 .header img {
   width: 40px;
   height: 40px;
+}
+
+nav {
+    width: 85%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    background: white;
+    z-index: 1;
+    display: none;
+}
+
+nav > div {
+  width: 30%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: #130F23;
+  margin-block: 18px;
 }
 
 .gradient{
@@ -166,7 +200,6 @@ footer {
  text-align: center;
  color: white;
  padding-block: 30px;
- 
 }
 
  a {
@@ -188,8 +221,11 @@ footer {
 }
 
 @media (min-width: 768px) {
+header img {
+    transform: translateX(10vw);
+}
   header h1 {
-  transform: translateX(0%);
+  transform: translateX(-10vw);
 }
 
   #hero {
@@ -210,8 +246,4 @@ footer {
   width: 80%;
   margin-left: 10%;
 }  
-  footer {
-    position: absolute;
-    bottom: 0px;
-  }
 }
