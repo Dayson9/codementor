@@ -18,13 +18,17 @@ const key = process.env.key;
 app.listen(port);
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname+"/dist/index.html");
+  res.sendFile(__dirname+"/dist/home.html");
 });
 
-app.get('/bot', (req, res) => {
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname+"/dist/home.html");
+});
+
+app.get('/neurobot', (req, res) => {
   res.sendFile(__dirname+"/dist/bot.html");
 });
 
 app.get('/init', (req, res) =>{
   res.send(key);
-})
+});
