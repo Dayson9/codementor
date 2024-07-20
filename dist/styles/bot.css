@@ -3,11 +3,21 @@
 }
 
 
-header {
+.header {
   justify-content: space-between;
   position: fixed;
   top: 0;
   background: white;
+  z-index: 1;
+}
+
+nav {
+  height: 100vh;
+  top: 60px;
+}
+
+nav span {
+  font-size: 0.8em;
 }
 
 .rowtop {
@@ -26,6 +36,7 @@ header {
 
 .header h1 {
   transform: translateX(10px);
+  font-size: 25px;
 }
 
 
@@ -45,11 +56,13 @@ header {
   padding: 10px;
   background: white;
   box-sizing: border-box;
+  font-size: 0.8em;
 }
 
 .bottom input, textarea {
   background: white;
   box-sizing: border-box;
+  font-size: 0.8em;
 }
 
 .bottom textarea {
@@ -112,6 +125,9 @@ input[type=text]:focus {
   border: none;
   margin-left: 10px;
   background: linear-gradient(155deg, rgba(42, 139, 240), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
+    -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  font-size: 30px;
 }
 
 button:hover {
@@ -142,10 +158,10 @@ button:hover {
 #main > div {
   width: auto;
   max-width: 55%;
+  min-width: 30%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 12px;
   color: white;
-  box-sizing: border-box;
   margin-top: 15px;
   padding-inline: 3.5%;
   padding-block: 3.0%;
@@ -153,9 +169,13 @@ button:hover {
   word-wrap: break-word;
 }
 
-div code {
+#main div code {
   font-family: "grotesk";
-  font-size: 13px;
+  font-size: 0.6em;
+}
+
+#main div span {
+  font-size: 0.8em;
 }
 
 .user {
@@ -165,6 +185,28 @@ div code {
 
 .bot {
   background: #130F2385;
+}
+
+.cp {
+  width: 20%;
+  height: auto;
+  left: 40%;
+  bottom: 40vh;
+  position: fixed;
+  text-align: center;
+  display: none;
+  opacity: 0;
+}
+
+.cp > span {
+  color: white;
+  width: auto;
+  height: auto;
+  padding-block: 3.5px;
+  padding-inline: 10px;
+  background: rgba(0,0,0,0.75);
+  border-radius: 60px;
+  font-size: 14px;
 }
 
 @media (min-width: 768px) {

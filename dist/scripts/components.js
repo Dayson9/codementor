@@ -1,27 +1,39 @@
 const { QComponent, Render } = QueFlow;
 import { UI_items } from "./ui_item.js";
 
+
 Render(UI_items[0], "#app");
 
+// Component for copied message
+const copied = new QComponent("#info", {
+  data: {
+    display: "none",
+    opacity: "0"
+  },
+  template: `
+          <div display="{{_this.data.display}}" opacity="{{_this.data.opacity}}" class="cp">
+            <span>Copied</span>
+          </div>`
+});
 
 // Component for the input 
 const inputInterface = new QComponent(".bottom", {
- data: {
+  data: {
   info: "",
   color: "rgba(0, 0, 0, 0.2)"
-},
+  },
 
-template: () =>{
-  return `
-  <div class="column">
-      <small color='{{_this.data.color}}'>{{_this.data.info}}</small>
-      <textarea id="code" cols="30" rows="10" placeholder="## Paste code here" border-color ='{{_this.data.color}}'></textarea>
-      <div class="row">
-          <input type="text" placeholder="Input command" id="command"/>
-          <button id="send">Go</button>
-       </div>
-  </div>`
-}
+  template: () =>{
+    return `
+      <div class="column">
+          <small color='{{_this.data.color}}'>{{_this.data.info}}</small>
+          <textarea id="code" cols="30" rows="10" placeholder="## Paste code here" border-color ='{{_this.data.color}}'></textarea>
+          <div class="row">
+              <input type="text" placeholder="Input command" id="command"/>
+              <button id="send" class="bx bxs-send"></button>
+          </div>
+      </div>`
+  }
 });
 
 
@@ -33,23 +45,23 @@ const chatInterface = new QComponent("#main", {
     
    return this.data.map((d, i) => {
     // Handles logic for the chat interface
-  let isLast = (i === this.data.length - 1);
+    let isLast = (i === this.data.length - 1);
   
-  let className = (d.user) ? "user" : "bot";
+    let className = (d.user) ? "user" : "bot";
   
-  let content = (d.user) ? `_this.data[${i}].user` : `_this.data[${i}].bot`;
+    let content = (d.user) ? `_this.data[${i}].user` : `_this.data[${i}].bot`;
   
     return `
-   <div class="${className}" ${isLast ? ' id="scroll"' : ''}>
-       <code>
-        {{${content}}}
-       </code>
-       ${d.command ? `<br><br><span>{{_this.data[${i}].command}}</span>`: ""}
-   </div>`; 
+      <div class="${className}" ${isLast ? ' id="scroll"' : ''}>
+          <code>
+            {{${content}}}
+          </code>
+          ${d.command ? `<br><br><span>{{_this.data[${i}].command}}</span>`: ""}
+      </div>`; 
      
-   }).join('');
+    }).join('');
     
   }
 });
 
-export { chatInterface, inputInterface }
+export { chatInterface, inputInterface, copied }

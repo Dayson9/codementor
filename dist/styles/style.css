@@ -33,6 +33,10 @@ body {
   transition: .3s;
 }
 
+ *, html {
+  scroll-behavior: smooth;
+}
+
 header {
   width: 100vw;
   height: 60px;
@@ -46,20 +50,20 @@ header {
 }
 
 header i {
-  width: 50px;
-  height: 50px;
-  background: white;
-  color: rgba(0,0,0,0.2);
-  border: 1px solid rgba(0,0,0,0.2);
-  border-radius: 3px;
-}
-header h1 {
-  transform: translateX(-5%);
+  color: #130F23;
+  z-index: 2;
+  font-size: 35px;
 }
 
-.header img {
+header h1 {
+  transform: translateX(-5%);
+  font-size: 25px;
+}
+
+header img {
   width: 40px;
   height: 40px;
+  margin-left: 15%;
 }
 
 nav {
@@ -70,23 +74,26 @@ nav {
     justify-content: start;
     align-items: center;
     position: fixed;
-    top: 60px;
-    left: 0;
+    left: -100%;
+    top: 0;
     background: white;
     z-index: 1;
-    display: none;
 }
 
 nav > div {
-  width: 30%;
-  height: auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  width: 40%;
+  height: 20%;
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: auto auto;
   color: #130F23;
   margin-block: 18px;
 }
+
+nav span {
+  color: #130F23;
+}
+
 
 .gradient{
     background: linear-gradient(135deg, rgba(105, 78, 255, 1), rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(42, 218, 240, 1));
@@ -109,7 +116,7 @@ nav > div {
 }
 
 #hero h1 {
-  font-size: 40px;
+  font-size: 30px;
   font-family: "Grotesk";
   font-weight: 800;
   color: #130F23;
@@ -122,13 +129,17 @@ nav > div {
  color: #130F23;
 }
 
+#hero .des {
+  font-size: 12px;
+}
+
 #hero button {
   width: 42%;
   height: 48px;
   margin-top: 16px;
   border-radius: 5px;
   background: auto;
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 500;
   font-family: "Grotesk";
   outline-style: solid;
@@ -159,6 +170,7 @@ nav > div {
   width: 100%;
   height: auto;
   padding-block: 10px;
+  font-size: 0.8em;
 }
 
 #features h2 {
@@ -181,16 +193,35 @@ height: 50px;
 text-align: center;
 font-size: 30px;
 padding-top: 10px;
+transform: translate(10px, 5px);
 box-sizing: border-box;
 border-radius: 50%;
 margin-top: -50px;
-background: linear-gradient(135deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1))!important;
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
 }
 
 .col{
 width: 80%;
+}
+
+#htu {
+  width: 100%;
+  height: auto;
+  padding-block: 10px;
+  font-size: 14px;
+  text-align: center;
+  padding-inline: 5px;
+  box-sizing: border-box;
+  background: linear-gradient(199deg, rgba(42, 139, 240, 1), rgba(42, 139, 240, 1), rgba(105, 78, 255, 1));
+  color: white;
+}
+
+
+#htu p {
+  font-size: 12.5px;
+}
+
+#htu a {
+  color: #130F23;
 }
 
 footer {
@@ -200,6 +231,7 @@ footer {
  text-align: center;
  color: white;
  padding-block: 30px;
+ font-size: 0.8em;
 }
 
  a {
@@ -215,9 +247,11 @@ footer {
   margin-left: 5%;
   border-left: 3px solid rgba(42, 139, 240, 1);
   border-radius: 5px;
+  margin-block: 40px;
   padding-inline: 5px;
   margin-bottom: 20px;
   box-sizing: border-box;
+  font-size: 0.8em;
 }
 
 @media (min-width: 768px) {
@@ -245,5 +279,14 @@ header img {
 #info {
   width: 80%;
   margin-left: 10%;
-}  
+}
+
+#htu *{
+  font-size: 14px;
+}
+
+#htu {
+  width: 80%;
+  margin-left: 10%;
+}
 }

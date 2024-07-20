@@ -2,7 +2,7 @@
 
 const QueFlow = ((exports) => {
   'use-strict';
-  // Stores data for all registered components and their associated template placeholders.
+  // Stores data for all elements that are not in components.
   var dataQF = [],
     // Counter for generating unique IDs for elements with reactive data.
     counterQF = 0;
@@ -59,7 +59,7 @@ const QueFlow = ((exports) => {
   function filterNullElements(input) {
   let data = input.filter((d) => {
       let el = selectElement(d.qfid);
-      // If element is truthy, return 'd'.
+      // If element exists, return its array (d).
       if (el) {
         return d;
       }
@@ -96,16 +96,8 @@ const QueFlow = ((exports) => {
       let v = shouldUpdate(pieces.template, key, len);
   
       if (v[0]) {
-        if (isNotEvent(pieces.key)) {
-      (pieces.key === "class") ? el.className = v[1] : el[pieces.key] = v[1];
-        } else {
-          // Cache event listeners for reuse
-          if (!eventListeners[pieces.qfid + pieces.key]) {
-            eventListeners[pieces.qfid + pieces.key] = v[1];
-            el.addEventListener(pieces.key.slice(2), eventListeners[pieces.qfid + pieces.key]);
-          }
-        }
-      }
+        style(el, pieces.key, v[1]);
+    }
     }
   }
 
@@ -113,32 +105,47 @@ const QueFlow = ((exports) => {
 function createSignal(data, object) {
   let item = typeof data != "object" ? { value: data } : data;
 
-let host = object.host;
+let handler = {};
 
-let handler = {
-  get: (target, key) => {
-    if (['object', 'array'].indexOf(typeof target[key]) > -1) {
-      return createSignal(target[key], host);
-    }
+if (object) {
+ let host = object.host;
+  handler = {
+    get: (target, key) => {
+      if (['object', 'array'].indexOf(typeof target[key]) > -1) return createSignal(target[key], host);
     return target[key];
     },
     
-  set: (target, key, value) =>{
-    key = (parseInt(key)) ? parseInt(key) : key;
-   
+    set: (target, key, value) => {
+      key = (parseInt(key)) ? parseInt(key) : key;
+      
       if (!host.isFrozen) {
         if (key > host.data.length - 1) {
           target[key] = value; // Update the target object accordingly
           host.render();
         } else {
-         // Update the target object accordingly
-          target[key] = value; 
+          // Update the target object accordingly
+          target[key] = value;
           _this = host;
           updateComponent(key, host);
         }
       }
       return true;
     }
+  };
+  } else {
+    handler = {
+      get: (target, key) => {
+    if (['object', 'array'].indexOf(typeof target[key]) > -1) return createSignal(target[key], host);
+      
+    return target[key];
+    },
+    
+     set: (target, key, value) =>{
+      target[key] = value;
+      updateDOM(key);
+      return true;
+     }
+   };
   }
    
   return new Proxy(item, handler);
@@ -151,24 +158,6 @@ let handler = {
     return children.length > 0 ? [true, children] : [false];
   }
 
-  // Creates a new DOM element with the specified tag name, attributes, and inner HTML.
-  function createElement(tagName, attribs = [], children) {
-    let el = document.createElement(tagName),
-      len = attribs.length,
-      i = 0;
-    // Sets attributes on the element.
-    for (i = 0; i < len; i++) {
-      let attrib = attribs[i].attribute;
-      let value = attribs[i].value;
-      el.setAttribute(attrib, value);
-    }
-
-    // Sets the inner HTML of the element.
-    el.innerHTML = children;
-
-    // Returns the created DOM element.
-    return el;
-  }
 
   // Extracts the string between two delimiters in a given string.
   function stringBetween(str, f, s) {
@@ -182,14 +171,14 @@ let handler = {
 
   // Sanitizes a string to prevent potential XSS attacks.
   function sanitizeString(str) {
-   return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, function(c){
-				return `&#${c.charCodeAt(0)};`;
+  return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, function(c){
+      return (c === "<" || c === ">") ? `&#${c.charCodeAt(0)};` : c;
 			});
   }
   
-  
+ 
   // Evaluates a template string by replacing placeholders with their values.
-  function evaluateTemplate(len, reff) {
+  function evaluateTemplate(len, reff, indicator) {
     let out = reff,
       i = 0,
       extracted = "",
@@ -197,24 +186,34 @@ let handler = {
      
     try {
       // Iterates through all placeholders in the template.
-      for (i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         // Extracts the placeholder expression.
         extracted = stringBetween(out, "{{", "}}");
-        // Evaluates the placeholder expression then sanitizes it.
+        
+        // Evaluates the placeholder expression.
+        parsed = Function('"use-strict"; return ' + extracted)().toString();
     
-        parsed = Function('"use-strict"; return ' + extracted)();
+    
+      if(!indicator) {
         // Replaces the placeholder with its evaluated value.
         out = out.replace("{{" + extracted + "}}", parsed);
+        } else {
+    // Replaces the placeholder with its sanitized evaluated value.
+        out = out.replace("{{" + extracted + "}}", sanitizeString(parsed));
+        }
       }
     } catch (error) {
       throw new Error("An error occurred while parsing JSX/HTML", error);
     }
+    
     // Returns the evaluated template string.
     return out;
   }
 
+
+
   // Gets the attributes of a DOM element.
-  function getAttributes(el, isComponent) {
+  function getAttributes(el) {
     let arr = [];
     let att,
       i = 0,
@@ -227,16 +226,7 @@ let handler = {
         // Adds the attribute name and value to the array.
         let name = att.nodeName, value = att.nodeValue;
         
-        if(el.style[name] || el.style[name] == "") {
-          if(isComponent) {
-          arr.push({ attribute: name, value: value });
-          } else {
-            arr.push({ attribute: "style."+name, value: value });
-          }
-          el.style[name] = value;
-      } else {
         arr.push({ attribute: name, value: value });
-      }
       }
     } catch (error) {
        new Error("An error occurred while getting the attributes of " + el, error);
@@ -247,41 +237,9 @@ let handler = {
     return arr;
   }
 
-  // Parses a JSX/HTML string and registers components for reactive updates.
-  function parseQF(arg = [], ref = "", id = "", isComponent) {
-    let component = [],
-      parsed,
-      len,
-      cpy,
-      index = 0;
-    // Counts the number of placeholders in the reference string.
-    len = countPlaceholders(ref);
-    if(!isComponent) {
-    // Iterates through the arguments.
-    arg.forEach((arr) => {
-      // Checks if the attribute value contains placeholders.
-      if (arr.value.includes("{{") && arr.value.includes("}}")) {
-        // Adds the component data to the array.
-        component[index] = { template: arr.value, key: arr.attribute, qfid: id };
-        index++;
-      }
-    });
-
-
-    // Creates a copy of the existing dataQF.
-    cpy = dataQF;
-    // Concatenates the new component data with the existing data.
-    dataQF = [...cpy, ...component];
-
-}
-    // Evaluates the template string with the provided length.
-    parsed = evaluateTemplate(len, ref);
-    
-    return parsed;
-  }
 
   // Converts JSX/HTML string into plain HTML, handling placeholders.
-  function jsxToHTML(jsx, isComponent) {
+  function jsxToHTML(jsx) {
     let div = document.createElement("div"),
       children = [],
       out = "",
@@ -302,28 +260,9 @@ let handler = {
       children.forEach((c) => {
         // Checks if the element has no children.
         if (!hasChildren(c)[0]) {
-          if(!isComponent) {
-          // Gets the attributes of the element.
-          attributes = getAttributes(c);
-          attributes.push({ attribute: "innerHTML", value: c.innerText });
-         
-          // Iterates through each attribute.
-          for (let {value} of attributes) {
-            // Checks if the attribute value contains placeholders.
-            if (value.includes("{{") && value.includes("}}")) {
-              // Assigns a unique ID to the element if the attribute contains templates.
-              c.dataset.qfid = "qf" + counterQF;
-              // Increments the counter for the next element.
-              counterQF++;
-              // Breaks the loop after finding a placeholder.
-              break;
-            }
-          }
-               // Parses the element's attributes and registers it for reactive updates.
-          out = parseQF(attributes, div.innerHTML, c.dataset.qfid, isComponent);
-          } else {
-            data = [...data, ...generateComponentData(c)];
-          }
+          data = [...data, ...generateComponentData(c)];
+        } else {
+          data = [...data, ...generateComponentData(c, true)];
         }
       });
       
@@ -334,11 +273,8 @@ let handler = {
     // Removes the temporary div element from the DOM.
     div.remove();
     
-      if(isComponent) {
-        let len = countPlaceholders(div.innerHTML);
-        out = evaluateTemplate(len, div.innerHTML);
-      }
-     
+    let len = countPlaceholders(div.innerHTML);
+    out = evaluateTemplate(len, div.innerHTML, true);
       
     // Returns the parsed HTML string.
     return [out, data];
@@ -346,11 +282,13 @@ let handler = {
 
   // Renders a JSX/HTML string into the specified selector.
   function Render(jsx, selector, position) {
-    let app = typeof selector == "string" ? document.querySelector(selector) : selector;
+    let app = typeof selector == "string" ? document.querySelector(selector) : selector, prep = "";
     // Checks if the selector is valid.
     if (app) {
-      // Converts the JSX/HTML string into plain HTML
-      let prep = jsxToHTML(jsx)[0];
+      let result = jsxToHTML(jsx);
+        // Re-renders the element's content.
+        prep = result[0];
+        dataQF = [...dataQF, ...result[1]];
 
       // Appends the HTML to the target element.
       if (position == "append") {
@@ -375,8 +313,11 @@ let handler = {
     if (app) {
       // Checks if the element has children.
       if (hasChildren(app)[0]) {
+        let result= jsxToHTML(app.innerHTML);
         // Re-renders the element's content.
-        app.innerHTML = jsxToHTML(app.innerHTML)[0];
+        app.innerHTML = result[0];
+        dataQF = [...dataQF, ...result[1]];
+        
       }
     } else {
       // Logs an error if the selector is invalid.
@@ -395,6 +336,7 @@ function isSame(obj1, obj2) {
  if(key1.length != key1.length) {
    result = false;
  } else {
+// Else, iterate over the key-value pairs and compare
    for (key of key1) {
      if((obj1[key] === obj2[key])) {
        result = true;
@@ -405,16 +347,18 @@ function isSame(obj1, obj2) {
    }
  }
 
+// Return comparation output
   return result;
 }
 
-// Generates and returns dataQF property for a component based on 'child' parameter
-function generateComponentData(child) {
-  let arr = [], attr = getAttributes(child, true), id = child.dataset.qfid;
+// Generates and returns dataQF property based on 'child' parameter
+function generateComponentData(child, isParent) {
+  let arr = [], attr = getAttributes(child), id = child.dataset.qfid;
   
+  if(!isParent) {
   // Pushes innertext attribute into 'attr'
   attr.push({attribute: "innerHTML", value: child.innerText});
-  
+  }
 for (let {attribute, value} of attr){
   
     let hasTemplate = (value.includes("{{") && value.includes("}}"));
@@ -428,7 +372,9 @@ for (let {attribute, value} of attr){
 
    if (child.style[attribute] || child.style[attribute] === "") {
      child.style[attribute] = evaluateTemplate(len, value);
+      if((attribute.toLowerCase()) !== "src") {
      child.removeAttribute(attribute);
+      }
    }
 
   
@@ -452,9 +398,7 @@ class QComponent {
 // Stores the element associated with a component
    _this.element = typeof selector == "string" ? document.querySelector(selector) : selector;
 
-  if(!_this.element) {
-    throw new Error("Element selector for component is invalid ",  selector)
-  }
+  if(!_this.element) throw new Error("Element selector for component is invalid ",  selector);
  
   // Creates a reactive signal for the component's data.
   _this.data = createSignal(options.data, {forComponent: true, host: this});
@@ -495,14 +439,14 @@ class QComponent {
   }
 
   render() {
-    let el = this.element;
-    
-    // Checks if the component's template is a string or a function.
-    let template = this.template instanceof Function ? this.template(this.data) : this.template;
-
     _this = this;
-    let rendered = jsxToHTML(template, true);
-  
+    let el = this.element;
+    // Checks if the component's template is a string or a function.
+    let template = this.template instanceof Function ? this.template() : this.template;
+
+    
+    let rendered = jsxToHTML(template);
+    
     el.innerHTML = rendered[0];
     this.dataQF = rendered[1];
   }
@@ -518,6 +462,7 @@ class QComponent {
   }
 
 }
+
 
 function style(child, key, evaluated) {
   if(key.indexOf("style.") > -1) {
@@ -547,9 +492,10 @@ for (let d of dataQF) {
     let { template, key, qfid } = d;
     let child = selectElement(qfid);
       if(template.includes(ckey)){
-        let len = countPlaceholders(template),
-        evaluated = evaluateTemplate(len, template);
+        let len = countPlaceholders(template);
       
+  evaluated = (key.includes("style."))? evaluateTemplate(len, template) : evaluateTemplate(len, template, true);
+ 
         key = (key === "class") ? "className" : key;
         style(child, key, evaluated);
       } 
