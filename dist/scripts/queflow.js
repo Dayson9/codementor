@@ -52,7 +52,7 @@ const QueFlow = ((exports) => {
     decision = temp.includes(key);
 
     // Evaluates the template with the provided length.
-    return [decision, evaluateTemplate(len, temp)];
+    return [decision, evaluateTemplate(len, temp, true)];
   }
 
   // Filters out null elements from the given input [Array].
