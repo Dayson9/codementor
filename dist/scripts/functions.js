@@ -13,7 +13,7 @@ function generateResponse(_code, comm) {
     let genAI = new GoogleGenerativeAI(init);
     let model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    let prompt = _code + `You are currently integrated into a web app that improves, explains, comments, rewrites a code, and other code related tasks, so from the above code,` + comm;
+    let prompt = _code + `Based on the above code,` + comm;
 
     model.generateContent(prompt).then(res => res.response).then(data => {
       chatInterface.data.push({ bot: data.text() });
