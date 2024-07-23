@@ -4,7 +4,7 @@
   "description": "Code alongside with AI",
   "main": "index.js",
   "repository": "https://github.com/Dayson9/codementor",
-  "author": "Render Developers",
+  "author": "Render Developers (Dayson)",
   "license": "MIT",
   "private": false,
   "scripts": {
