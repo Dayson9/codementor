@@ -43,7 +43,7 @@ const chatInterface = new QComponent("#main", {
   template: function() {
     if(!this.data.length) return '';
     
-   return this.data.map((d, i) => {
+   return _this.data.map((d, i) => {
     // Handles logic for the chat interface
     let isLast = (i === this.data.length - 1);
   

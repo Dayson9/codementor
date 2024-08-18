@@ -48,7 +48,7 @@ function sendChat() {
         behavior: 'smooth',
         block: 'start',
       });
-    }, 300);
+    }, 200);
 
     code.value = "";
     command.value = "";
@@ -75,6 +75,7 @@ function indicate() {
     inputInterface.data.info = "Good 😊";
   }
 }
+
 
 /**
  * Copies specified string to clipboard
