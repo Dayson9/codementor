@@ -32,3 +32,9 @@ app.get('/neurobot', (req, res) => {
 app.get('/init', (req, res) =>{
   res.send(key);
 });
+
+const dns = require('dns');
+
+dns.lookup('https://www.facebook.com', (err, address, family) => {
+  console.error('address: %j family: IPv %s', address, family);
+});
