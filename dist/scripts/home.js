@@ -1,6 +1,7 @@
 const { Render } = QueFlow;
 import { UI_items } from './ui_item.js';
 
+
 Render(UI_items[1], "#app");
 
 const nav = document.querySelector("nav"), trigger = document.querySelector("#trigger"), navLinks = nav.querySelectorAll("a");
